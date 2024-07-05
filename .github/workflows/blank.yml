@@ -11,10 +11,10 @@ jobs:
     env:
       GREETING: Hello    #Can we used only in this Job and any Action/Script
     steps:
-    - name: Print value of Variable
+    - name: Print value of Variable GREETING is ${{ env.GREETING }}
       run: |
         echo "Value of Greeting is: ${{ env.GREETING }}"
-        echo "Value of Greeting is: $Greeting"
+        echo "Value of Greeting is: $GREETING"
         echo "Value of Repo Variable is: ${{ vars.REPO_VARIABLE1 }}"
         echo "Value of Repo Secret is: ${{ secrets.REPO_SECRET1 }}"
     

@@ -1,25 +1,30 @@
-name: VariablesDemoWorkflow
-on:
-  workflow_dispatch:
-
-env:
-  DAY_OF_WEEK: Monday    #Can we used in any Job 
-
+name: Caching Demo
+on: workflow_dispatch
 jobs:
-  example-job:
+  build:
     runs-on: ubuntu-latest
-    env:
-      GREETING: Hello    #Can we used only in this Job and any Action/Script
     steps:
-    - name: Print value of Variable GREETING is ${{ env.GREETING }}
-      run: |
-        echo "Value of Greeting is: ${{ env.GREETING }}"
-        echo "Value of Greeting is: $GREETING"
-        echo "Value of Repo Variable is: ${{ vars.REPO_VARIABLE1 }}"
-        echo "Value of Repo Secret is: ${{ secrets.REPO_SECRET1 }}"
-    
-    - name: "Say Hello, it's Monday"
-      if: ${{ env.DAY_OF_WEEK == 'Monday' }}
-      run: echo "${{ env.GREETING }} ${{ env.FirstName }}. Today is ${{ env.DAY_OF_WEEK }}!"
-      env:
-        FIRSTNAME: Sandeep  #Can be used only in this Action/Script
+      - uses: actions/checkout@v4
+
+      - name: Create File DemoFile.txt
+        run: echo $(date) > DemoFile.txt
+        
+      - name: Cache DemoFile.txt     
+        uses: actions/cache@v3
+        id: demo-cache-id
+        env:
+          cache-name: cache-demo-file
+        with:
+          path: DemoFile.txt
+          key: ${{ hashFiles('cache-dependency-file.txt') }}
+
+      - name: Print Content of DemoFile
+        run: cat DemoFile.txt
+        
+      - name: Cache Found
+        if: ${{ steps.demo-cache-id.outputs.cache-hit == 'true' }}
+        run: echo "Cache Found"
+
+      - name: Cache Not Found
+        if: ${{ steps.demo-cache-id.outputs.cache-hit != 'true' }}
+        run: echo "Cache Not Found"
